@@ -27,6 +27,7 @@ FROM debian:bookworm-slim
 ENV SND_DEVICE="default"
 ENV SNAPSERVER="NOT YET SET"
 ENV SNAPSERVER_PORT="1704"
+ENV CLIENT_HOST_ID="NOT YET SET"
 ENV LIST_DEVICES_AND_EXIT="false"
 
 # Apt dependencies for snapclient use, pulled from deps of prebuilt "with pulse" snapclient build

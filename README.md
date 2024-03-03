@@ -11,6 +11,9 @@ The following environment variables can be used when running this container:
     - The port on which your snapserver is listening for connections on (default for snapcast is 1704)
  - `SND_DEVICE` (=default) **OPTIONAL**
     - The name/index of the audio device you would like snapclient to play audio to
+ - `CLIENT_HOST_ID` (=MAC in container) **OPTIONAL**
+    - The unique identifier snapserver can use to refer to this endpoint.
+    - Defaults to the MAC address, however, those are not guaranteed to be static in docker, so it is recommended to chose your own.
  - `LIST_DEVICES_AND_EXIT` (=false) **OPTIONAL**
     - If this is set to true, the container will simply dump the list of snapcast-available audio devices and exit (equivalent to `snapclient -l`)
     - Snapclient will not be started in this mode
