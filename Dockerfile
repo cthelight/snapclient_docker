@@ -5,17 +5,20 @@ FROM debian:bookworm-slim as builder
 RUN apt-get update
 
 # Install build deps for snapclient
-RUN apt-get install pkg-config libasound2-dev curl build-essential libpulse-dev libvorbisidec-dev libvorbis-dev libopus-dev libflac-dev libsoxr-dev alsa-utils libavahi-client-dev avahi-daemon libexpat1-dev libboost-dev git -y
+RUN apt-get install pkg-config libasound2-dev curl build-essential libpulse-dev libvorbisidec-dev libvorbis-dev libopus-dev libflac-dev libsoxr-dev alsa-utils libavahi-client-dev avahi-daemon libexpat1-dev libboost-dev git cmake -y
 # Check out latest release (0.27.0)
 RUN git clone https://github.com/badaix/snapcast.git
 WORKDIR /snapcast
-RUN git checkout v0.27.0
+RUN git checkout v0.28.0
 
 # Build just the client
-RUN make -j $(nproc --all) client
+RUN mkdir build
+WORKDIR /snapcast/build
+RUN cmake .. -DBUILD_SERVER=OFF
+RUN cmake --build .
 
 # Move the resulting binary somewhere with a shorter path to reference later
-RUN cp client/snapclient /snapclient
+RUN cp ../bin/snapclient /snapclient
 
 #================================================================
 # Actual container that will be distributed.
