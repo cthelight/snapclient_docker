@@ -9,7 +9,7 @@ RUN apt-get install pkg-config libasound2-dev curl build-essential libpulse-dev 
 # Check out latest release (0.27.0)
 RUN git clone https://github.com/badaix/snapcast.git
 WORKDIR /snapcast
-RUN git checkout v0.28.0
+RUN git checkout v0.29.0
 
 # Build just the client
 RUN mkdir build
