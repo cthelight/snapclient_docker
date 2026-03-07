@@ -1,5 +1,5 @@
 #================================================================ Simple builder container to contain (and not ship) the mess of the build. ================================================================
-FROM debian:bookworm-slim as builder
+FROM debian:trixie-slim as builder
 RUN apt-get update
 
 # Install build deps for snapclient
@@ -22,7 +22,7 @@ RUN cp ../bin/snapclient /snapclient
 # Actual container that will be distributed.
 # Copies relevant built artifacts from the builder container
 #================================================================
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # ENV variables used to configure snapclient instance
 ENV SND_DEVICE="default"
@@ -33,7 +33,7 @@ ENV LIST_DEVICES_AND_EXIT="false"
 
 # Apt dependencies for snapclient use, pulled from deps of prebuilt "with pulse" snapclient build
 # Minor change for bookeworm is flac12 not flac8 being required
-RUN apt-get update && apt-get install alsa-utils libasound2 libatomic1 libavahi-client3 libavahi-common3 libc6 libflac12 libgcc-s1 libogg0 libopus0 libsoxr0 libstdc++6 libvorbisidec1 adduser libpulse0 -y
+RUN apt-get update && apt-get install alsa-utils libasound2t64 libatomic1 libavahi-client3 libavahi-common3 libc6 libflac14 libgcc-s1 libogg0 libopus0 libsoxr0 libstdc++6 libvorbisidec1 adduser libpulse0 -y
 
 # Steal the built snapclient from our builder container
 COPY --from=builder /snapclient /usr/bin/snapclient
