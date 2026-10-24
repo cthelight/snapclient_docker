@@ -4,10 +4,10 @@ RUN apt-get update
 
 # Install build deps for snapclient
 RUN apt-get install pkg-config libasound2-dev curl build-essential libpulse-dev libvorbisidec-dev libvorbis-dev libopus-dev libflac-dev libsoxr-dev alsa-utils libavahi-client-dev avahi-daemon libexpat1-dev libboost-dev git cmake libssl-dev -y
-# Check out latest release (0.27.0)
-RUN git clone https://github.com/badaix/snapcast.git
+# Check out latest release (0.35.0)
+RUN git clone https://github.com/snapcast/snapcast.git
 WORKDIR /snapcast
-RUN git checkout v0.34.0
+RUN git checkout v0.35.0
 
 # Build just the client
 RUN mkdir build

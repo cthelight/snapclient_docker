@@ -1,6 +1,6 @@
 Snapclient in a docker container
 
-This repo contains the info required to create the snapclient docker container, which is used as a snapcast endpoint, for music streaming (see https://github.com/badaix/snapcast for info on snapcast).
+This repo contains the info required to create the snapclient docker container, which is used as a snapcast endpoint, for music streaming (see https://github.com/snapcast/snapcast for info on snapcast).
 
 As you likely want audio to be able to be played through a real audio device, you generally will need to map `/dev/snd` into the container as a device (unless, of course, you know what you are doing).
 
