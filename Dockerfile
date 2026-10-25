@@ -97,6 +97,9 @@ FROM scratch
 COPY --from=builder /src/snapcast/bin/snapclient /usr/local/bin/snapclient
 COPY --from=builder /entrypoint /usr/bin/entrypoint
 COPY --from=builder /healthcheck /usr/bin/healthcheck
+# ALSA global config (alsa.conf + pcm/cards definitions); without it ALSA
+# cannot resolve the "default" device on real hardware
+COPY --from=builder /usr/share/alsa /usr/share/alsa
 
 # ENV variables used to configure snapclient instance
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
