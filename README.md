@@ -4,6 +4,8 @@ This repo contains the info required to create the snapclient docker container, 
 
 As you likely want audio to be able to be played through a real audio device, you generally will need to map `/dev/snd` into the container as a device (unless, of course, you know what you are doing).
 
+The image is built fully static on a `scratch` base: it contains only the `snapclient` binary and a small static entrypoint, so it ships no shell (there is no `docker run ... sh` for poking around inside it).
+
 The following environment variables can be used when running this container:
  - `SNAPSERVER` **REQUIRED**
     - The hostname or IP of the server you would like the snapclient to connect to
