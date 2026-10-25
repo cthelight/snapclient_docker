@@ -84,13 +84,19 @@ RUN file bin/snapclient && ./bin/snapclient -v
 COPY ./entrypoint.c /src/entrypoint.c
 RUN gcc -O2 -Wall -Wextra -static -s -o /entrypoint /src/entrypoint.c
 
+# Static healthcheck: TCP-connect probe against SNAPSERVER:SNAPSERVER_PORT
+# (the image has no shell or network tools to run a HEALTHCHECK with)
+COPY ./healthcheck.c /src/healthcheck.c
+RUN gcc -O2 -Wall -Wextra -static -s -o /healthcheck /src/healthcheck.c
+
 #================================================================
 # Actual container that will be distributed.
-# Two statically linked binaries and nothing else.
+# Three statically linked binaries and nothing else.
 #================================================================
 FROM scratch
 COPY --from=builder /src/snapcast/bin/snapclient /usr/local/bin/snapclient
 COPY --from=builder /entrypoint /usr/bin/entrypoint
+COPY --from=builder /healthcheck /usr/bin/healthcheck
 
 # ENV variables used to configure snapclient instance
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
@@ -99,6 +105,10 @@ ENV SNAPSERVER="NOT YET SET"
 ENV SNAPSERVER_PORT="1704"
 ENV CLIENT_HOST_ID="NOT YET SET"
 ENV LIST_DEVICES_AND_EXIT="false"
+
+# Healthy = snapserver reachable (snapclient itself exposes no external state)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD ["/usr/bin/healthcheck"]
 
 # Start snapclient
 CMD ["/usr/bin/entrypoint"]
