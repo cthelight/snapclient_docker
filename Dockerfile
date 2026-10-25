@@ -1,11 +1,12 @@
 #================================================================ Simple builder container to contain (and not ship) the mess of the build. ================================================================
 # Alpine + musl toolchain: snapclient is linked fully static so the final image can be "FROM scratch".
-# clang/libc++ is used because Alpine ships libc++-static but no libstdc++-static.
+# GCC is used (not clang/libc++): Alpine's clang19 armv7 build has broken C++ exception
+# handling (ARM-EHABI unwind tables are misread by the libgcc unwinder, so any throw aborts).
+# Alpine does ship libstdc++.a (static), so GCC gives a fully consistent static toolchain.
 FROM alpine:3.21 AS builder
 
 RUN apk add --no-cache \
-    autoconf automake libtool gettext bash build-base \
-    clang19 libc++ libc++-dev libc++-static \
+    autoconf automake libtool gettext bash build-base g++ libstdc++-dev \
     cmake meson ninja git pkgconf file curl \
     expat-dev expat-static soxr-dev soxr-static \
     openssl-dev openssl-libs-static \
@@ -66,17 +67,17 @@ RUN curl -sSL -o /src/avahi-0.8.tar.gz https://avahi.org/download/avahi-0.8.tar.
 # Check out the release to build
 RUN git clone --depth 1 --branch v0.35.0 https://github.com/snapcast/snapcast /src/snapcast
 WORKDIR /src/snapcast
-# -static + libc++ for the musl static link; -lgomp because Alpine's static libsoxr
+# -static for the musl static link; -lgomp because Alpine's static libsoxr
 # (a snapclient dependency) is built with OpenMP.
 RUN cmake -B build \
     -DBUILD_SERVER=OFF -DBUILD_STATIC_LIBS=ON \
     -DOPENSSL_USE_STATIC_LIBS=ON -DOPENSSL_ROOT_DIR=/usr \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
     -DCMAKE_C_FLAGS="-static -ffunction-sections -fdata-sections" \
-    -DCMAKE_CXX_FLAGS="-static -stdlib=libc++ -ffunction-sections -fdata-sections" \
+    -DCMAKE_CXX_FLAGS="-static -ffunction-sections -fdata-sections" \
     -DCMAKE_EXE_LINKER_FLAGS="-static -s -Wl,--gc-sections" \
-    -DCMAKE_CXX_STANDARD_LIBRARIES="-Wl,--start-group -lc -lc++ -lc++abi -lm -lgomp -Wl,--end-group"
+    -DCMAKE_CXX_STANDARD_LIBRARIES="-Wl,--start-group -lc -lstdc++ -lm -lgcc -lgomp -Wl,--end-group"
 RUN cmake --build build -j$(nproc)
 RUN file bin/snapclient && ./bin/snapclient -v
 
